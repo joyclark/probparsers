@@ -10,8 +10,10 @@ import java.io.PrintWriter;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,7 +39,18 @@ import de.be4.classicalb.core.parser.exceptions.BParseException;
 import de.be4.classicalb.core.parser.exceptions.CheckException;
 import de.be4.classicalb.core.parser.exceptions.PreParseException;
 import de.be4.classicalb.core.parser.lexer.LexerException;
+import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
+import de.be4.classicalb.core.parser.node.AImplementationMachineParseUnit;
+import de.be4.classicalb.core.parser.node.AMachineClauseParseUnit;
+import de.be4.classicalb.core.parser.node.APragma;
+import de.be4.classicalb.core.parser.node.APragmasMachineClause;
+import de.be4.classicalb.core.parser.node.ARefinementMachineParseUnit;
+import de.be4.classicalb.core.parser.node.PMachineClause;
+import de.be4.classicalb.core.parser.node.PParseUnit;
+import de.be4.classicalb.core.parser.node.PPragma;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.node.TString;
+import de.be4.classicalb.core.parser.node.TStringBody;
 import de.be4.classicalb.core.parser.node.Token;
 import de.be4.classicalb.core.parser.parser.Parser;
 import de.be4.classicalb.core.parser.parser.ParserException;
@@ -258,9 +271,12 @@ public class BParser {
 			final BLexer lexer = new BLexer(new PushbackReader(reader, 99),
 					defTypes, input.length() / APPROXIMATE_TOKEN_LENGTH);
 			lexer.setDebugOutput(debugOutput);
-
 			parser = new Parser(lexer);
 			final Start rootNode = parser.parse();
+			
+			attachPragmas(rootNode.getPParseUnit(),lexer);
+			
+			
 			final List<IToken> tokenList = lexer.getTokenList();
 
 			/*
@@ -319,6 +335,33 @@ public class BParser {
 			throw new BException(fileName, e);
 		} catch (final CheckException e) {
 			throw new BException(fileName, e);
+		}
+	}
+
+	private void attachPragmas(PParseUnit pParseUnit, BLexer lexer) {
+		if (pParseUnit instanceof AAbstractMachineParseUnit) {
+			attachPragmas(((AAbstractMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
+		}
+		if (pParseUnit instanceof ARefinementMachineParseUnit) {
+			attachPragmas(((ARefinementMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
+		}
+		if (pParseUnit instanceof AImplementationMachineParseUnit) {
+			attachPragmas(((AImplementationMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
+		}
+	}
+
+	private void attachPragmas(LinkedList<PMachineClause> machineClauses,
+			BLexer lexer) {
+		List<Pragma> pragmas = lexer.getPragmas();		
+		for (Pragma pragma : pragmas) {
+
+			String[] words = pragma.content.split(" ");
+			List<TStringBody> sbd = new ArrayList<TStringBody>();
+			for (String word : words) {
+				sbd.add(new TStringBody(word));
+			}
+			APragma ap = new APragma(sbd);
+			machineClauses.add(new APragmasMachineClause(ap));
 		}
 	}
 

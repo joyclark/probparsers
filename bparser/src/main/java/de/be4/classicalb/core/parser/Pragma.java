@@ -3,7 +3,7 @@ package de.be4.classicalb.core.parser;
 public class Pragma {
 	private final int line;
 	private final int column;
-	private final String content;
+	public final String content;
 
 	public Pragma(int line, int column, String content) {
 		this.line = line;

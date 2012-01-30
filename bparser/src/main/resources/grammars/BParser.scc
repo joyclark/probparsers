@@ -12,8 +12,6 @@ Helpers
     cr = 13;
     comment_start = '/*';
     comment_end = '*/';
-    pragma_start ='/*!';
-    pragma_end ='/*!';
 
     small_letter =  ['a'..'z'];
     capital_letter = ['A' .. 'Z'];
@@ -32,7 +30,6 @@ Helpers
  *******************************************************************/
 
 States
-
 	normal,
 	string,
 	comment;
@@ -876,7 +873,10 @@ machine_clause =
 	{assertions} [predicates]:predicate* |
 	{values} [entries]:values_entry* |
 	{local_operations} [operations]:operation* |
-	{operations} [operations]:operation* ;
+	{operations} [operations]:operation* |
+	{pragmas} [pragmas]:pragma;
+	
+pragma = string_body+;	
 	
 machine_reference = [machine_name]:identifier_literal* [parameters]:expression* ;
 

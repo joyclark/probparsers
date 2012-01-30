@@ -7,18 +7,30 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.be4.classicalb.core.parser.analysis.ASTPrinter;
+import de.be4.classicalb.core.parser.analysis.prolog.ASTProlog;
+import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.lexer.LexerException;
 import de.be4.classicalb.core.parser.node.EOF;
+import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.node.Token;
 
 
-public class LexerTest {
+public class PragmaTest {
 
 	@Test
-	public void test() throws LexerException, IOException {
+	public void test() throws LexerException, IOException, BException {
 		pragmaprint("some foo /* comment */ more foo /*! my pragma is bigger than yours !*/ and even more foo!");
 		pragmaprint("some foo /* comment */ more foo /*! my pragma is bigger than yours */ and even more foo!");
-
+		pragmaprint("/*! symbolic a b c */");
+		pragmaparse("MACHINE foo /*! symbolic x y */ END");
+	}
+	
+	private void pragmaparse(String input) throws BException {
+		BParser p = new BParser();
+		Start start = p.parse(input, false);
+		ASTPrinter pr =  new ASTPrinter(System.out);		
+		start.apply(pr);
 	}
 
 	private void pragmaprint(String input) throws LexerException, IOException {
