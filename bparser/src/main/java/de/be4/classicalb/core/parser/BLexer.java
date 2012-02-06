@@ -23,6 +23,7 @@ public class BLexer extends Lexer {
 	private TComment comment = null;
 	private StringBuilder commentBuffer = null;
 	private List<Pragma> pragmas = new ArrayList<Pragma>();
+	private Token previous = null;
 
 	private final DefinitionTypes definitions;
 
@@ -63,12 +64,14 @@ public class BLexer extends Lexer {
 			}
 
 			buildTokenList();
-
+			
 			if (debugOutput && !(token instanceof TWhiteSpace)
 					&& !(token instanceof EOF)) {
 				System.out.print(token.getClass().getSimpleName() + "('"
 						+ token.getText() + "') ");
 			}
+			if (!(token instanceof TWhiteSpace) && !(token instanceof TComment))
+			previous = token;
 		}
 	}
 
@@ -146,7 +149,7 @@ public class BLexer extends Lexer {
 				if (text.startsWith("/*!")) {
 					String pragma = "";
 					if (text.endsWith("!*/")) pragma = text.substring(3, text.length()-3).trim(); else  pragma = text.substring(3, text.length()-2).trim();
-					pragmas.add(new Pragma(token.getLine(), token.getPos(), pragma));
+					pragmas.add(new Pragma(token.getLine(), token.getPos(), pragma, previous));
 				}
 			} else {
 				token = null;
