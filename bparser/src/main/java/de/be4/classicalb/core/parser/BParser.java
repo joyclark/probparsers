@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,12 +43,10 @@ import de.be4.classicalb.core.parser.lexer.LexerException;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.AImplementationMachineParseUnit;
 import de.be4.classicalb.core.parser.node.AMachineClauseParseUnit;
-import de.be4.classicalb.core.parser.node.APragma;
 import de.be4.classicalb.core.parser.node.APragmasMachineClause;
 import de.be4.classicalb.core.parser.node.ARefinementMachineParseUnit;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.PParseUnit;
-import de.be4.classicalb.core.parser.node.PPragma;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.node.TString;
 import de.be4.classicalb.core.parser.node.TStringBody;
@@ -95,7 +94,7 @@ public class BParser {
 		final SourcePositions positions = withLineInfo ? parser
 				.getSourcePositions() : null;
 		rml.loadAllMachines(bfile, tree, positions, parser.getDefinitions());
-		rml.printAsProlog(new PrintWriter(out), idention);
+		rml.printAsProlog(new PrintWriter(out), idention, parser.attachPragmas(machineClauses, lexer) );
 	}
 
 	private static String getASTasFastProlog(final BParser parser,
@@ -338,31 +337,34 @@ public class BParser {
 		}
 	}
 
-	private void attachPragmas(PParseUnit pParseUnit, BLexer lexer) {
+	private List<Pragma> attachPragmas(PParseUnit pParseUnit, BLexer lexer) {
 		if (pParseUnit instanceof AAbstractMachineParseUnit) {
-			attachPragmas(((AAbstractMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
+			return attachPragmas(((AAbstractMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
 		}
 		if (pParseUnit instanceof ARefinementMachineParseUnit) {
-			attachPragmas(((ARefinementMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
+			return attachPragmas(((ARefinementMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
 		}
 		if (pParseUnit instanceof AImplementationMachineParseUnit) {
-			attachPragmas(((AImplementationMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
+			return attachPragmas(((AImplementationMachineParseUnit) pParseUnit).getMachineClauses(),lexer);
 		}
+		return Collections.emptyList();
 	}
 
-	private void attachPragmas(LinkedList<PMachineClause> machineClauses,
+	private List<Pragma> attachPragmas(LinkedList<PMachineClause> machineClauses,
 			BLexer lexer) {
-		List<Pragma> pragmas = lexer.getPragmas();		
-		for (Pragma pragma : pragmas) {
-
-			String[] words = pragma.content.split(" ");
-			List<TStringBody> sbd = new ArrayList<TStringBody>();
-			for (String word : words) {
-				sbd.add(new TStringBody(word));
-			}
-			APragma ap = new APragma(sbd);
-			machineClauses.add(new APragmasMachineClause(ap));
-		}
+		return lexer.getPragmas();		
+//		for (Pragma pragma : pragmas) {
+//			String[] words = pragma.content.split(" ");
+//			List<TStringBody> sbd = new ArrayList<TStringBody>();
+//			Token pred = pragma.pred;
+//			TStringBody predToken = new TStringBody(pred.getText(), pred.getLine(), pred.getPos());
+//			sbd.add(predToken);
+//			for (String word : words) {
+//				sbd.add(new TStringBody(word));
+//			}
+//			APragma ap = new APragma(sbd);
+//			machineClauses.add(new APragmasMachineClause(ap));
+//		}
 	}
 
 	private DefinitionTypes preParsing(final boolean debugOutput,

@@ -6,7 +6,7 @@ public class Pragma {
 	private final int line;
 	private final int column;
 	public final String content;
-	private final Token pred;
+	public final Token pred;
 
 	public Pragma(int line, int column, String content, Token pred) {
 		this.line = line;

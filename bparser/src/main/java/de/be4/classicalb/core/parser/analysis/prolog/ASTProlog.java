@@ -67,6 +67,7 @@ import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.AOppatternParseUnit;
 import de.be4.classicalb.core.parser.node.AParallelSubstitution;
 import de.be4.classicalb.core.parser.node.APartitionPredicate;
+import de.be4.classicalb.core.parser.node.APragmasMachineClause;
 import de.be4.classicalb.core.parser.node.APredicateDefinition;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.APrimedIdentifierExpression;
@@ -139,6 +140,7 @@ public class ASTProlog extends DepthFirstAdapter {
 			positionPrinter.setPrologTermOutput(pout);
 		}
 	}
+
 
 	private static Map<String, String> createRewritings() {
 		Map<String, String> rewritings = new HashMap<String, String>();
@@ -1021,6 +1023,12 @@ public class ASTProlog extends DepthFirstAdapter {
 		printIdentifier(node.getName());
 		printAsList(node.getParameters());
 		close(node);
+	}
+	
+	@Override
+	public void outAPragmasMachineClause(APragmasMachineClause node) {
+		super.outAPragmasMachineClause(node);
+		
 	}
 
 }

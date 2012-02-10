@@ -874,9 +874,8 @@ machine_clause =
 	{values} [entries]:values_entry* |
 	{local_operations} [operations]:operation* |
 	{operations} [operations]:operation* |
-	{pragmas} [pragmas]:pragma;
+	{pragmas};
 	
-pragma = string_body+;	
 	
 machine_reference = [machine_name]:identifier_literal* [parameters]:expression* ;
 
