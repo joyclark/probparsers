@@ -76,6 +76,7 @@ public class BParser {
 
 	private Set<String> doneDefFiles = new HashSet<String>();
 	private final String fileName;
+	private BLexer lexer;
 
 	public BParser() {
 		this(null);
@@ -87,14 +88,19 @@ public class BParser {
 
 	public static void printASTasProlog(final PrintStream out,
 			final BParser parser, final File bfile, final Start tree,
-			final boolean idention, final boolean withLineInfo)
+			final boolean indention, final boolean withLineInfo)
 			throws BException {
 		final RecursiveMachineLoader rml = new RecursiveMachineLoader(
 				bfile.getParent());
 		final SourcePositions positions = withLineInfo ? parser
 				.getSourcePositions() : null;
 		rml.loadAllMachines(bfile, tree, positions, parser.getDefinitions());
-		rml.printAsProlog(new PrintWriter(out), idention, parser.attachPragmas(machineClauses, lexer) );
+		List<Pragma> pragmas = parser.attachPragmas(tree.getPParseUnit(), parser.lexer);
+		for (Pragma pragma : pragmas) {
+			System.out.println("P:"+pragma);
+		}
+		rml.printAsProlog(new PrintWriter(out), indention);
+	//	rml.printAsProlog(new PrintWriter(out), idention, parser.attachPragmas(machineClauses, lexer) );
 	}
 
 	private static String getASTasFastProlog(final BParser parser,
@@ -264,10 +270,7 @@ public class BParser {
 				System.out.println();
 			}
 
-			/*
-			 * Main parser
-			 */
-			final BLexer lexer = new BLexer(new PushbackReader(reader, 99),
+			lexer = new BLexer(new PushbackReader(reader, 99),
 					defTypes, input.length() / APPROXIMATE_TOKEN_LENGTH);
 			lexer.setDebugOutput(debugOutput);
 			parser = new Parser(lexer);

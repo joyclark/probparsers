@@ -17,6 +17,6 @@ public class Pragma {
 	
 	@Override
 	public String toString() {
-		return content + " ("+line+","+column+") pred:"+pred.getText();
+		return content + " ("+line+","+column+") pred:"+pred.getText() + " ("+pred.getLine()+","+pred.getPos()+")";
 	}
 }

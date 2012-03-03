@@ -1,5 +1,6 @@
 package de.be4.classicalb.core.parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
@@ -19,11 +20,16 @@ public class PragmaTest {
 
 	@Test
 	public void test() throws LexerException, IOException, BException {
-		pragmaprint("some foo /* comment */ more m7 /*! my pragma is bigger than yours !*/ and even more foo!");
-		pragmaprint("some foo /* comment */ more m8 /*! my pragma is bigger than yours */ and even more foo!");
-		pragmaprint("dawg /*! symbolic a b c */");
-		pragmaparse("MACHINE m1 /*! symbolic x y */ END");
-		pragmaprint("MACHINE m0 /*dingo*/ /*! symbolic x y */ END");
+//		pragmaprint("some foo /* comment */ more m7 /*! my pragma is bigger than yours !*/ and even more foo!");
+//		pragmaprint("some foo /* comment */ more m8 /*! my pragma is bigger than yours */ and even more foo!");
+//		pragmaprint("dawg /*! symbolic a b c */");
+//		pragmaparse("MACHINE m1 /*! symbolic x y */ END");
+		String input = "MACHINE m0 /*dingo*/ /*! symbolic x y */   VARIABLES x  INVARIANT x:NAT INITIALISATION x:= (2+5) /*! x == 7 */   END";
+//		pragmaprint(input);
+		BParser p = new BParser();
+		Start start = p.parse(input, false);
+		p.printASTasProlog(System.out, p, new File(""), start, false, true);
+		
 	}
 	
 	
